@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "probe-rs-debug",
+            "request": "launch",
+            "name": "Debug STM32H7 with probe-rs",
+            "probe": "1209:4853:dc61cd078f743b33ef4014",
+            "chip": "STM32H753Tx",
+            "flashingConfig": {
+                "flashingEnabled": true,
+                "haltAfterReset": false
+            },
+            "coreConfigs": [
+                {
+                    "coreIndex": 0,
+                    "programBinary": "${workspaceFolder}/target/thumbv7em-none-eabihf/debug/rs-hardware"
+                }
+            ],
+            "consoleLogLevel": "Debug",
+            "env": {
+                "RUST_LOG": "info"
+            }
+        }
+    ]
+}
