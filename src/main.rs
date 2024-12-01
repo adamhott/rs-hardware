@@ -6,6 +6,7 @@ use embassy_executor::Spawner;
 use embassy_stm32::i2c::{self, I2c};
 use embassy_stm32::time::Hertz;
 use embassy_stm32::{bind_interrupts, peripherals};
+use embassy_time::{Timer, Duration};
 use embedded_hal_async::i2c::I2c as HalI2c;
 use embedded_hal_async::delay::DelayNs;
 use icm426xx::{ICM42688, Ready, Uninitialized};
@@ -23,40 +24,23 @@ impl IcmDelay {
 
 impl DelayNs for IcmDelay {
     async fn delay_ns(&mut self, ns: u32) {
-        // Convert nanoseconds to milliseconds, rounding up
-        let ms = (ns + 999_999) / 1_000_000;
-        self.delay_ms(ms);
+        Timer::after(Duration::from_nanos(ns as u64)).await;
     }
 
     async fn delay_us(&mut self, us: u32) {
-        // Convert microseconds to milliseconds, rounding up
-        let ms = (us + 999) / 1_000;
-        self.delay_ms(ms);
+        Timer::after(Duration::from_micros(us as u64)).await;
     }
 
     async fn delay_ms(&mut self, ms: u32) {
-        // Implement an actual delay for ms milliseconds
-        software_delay(ms);
+        Timer::after(Duration::from_millis(ms as u64)).await;
     }
-}
-
-/// Simulates a software delay by performing a busy-wait.
-fn software_delay(ms: u32) {
-    let now = get_current_time_millis();
-    while get_current_time_millis() < now + ms {}
-}
-
-/// Mock function to return current time in milliseconds.
-/// Replace this with a hardware-specific timer retrieval in a real application.
-fn get_current_time_millis() -> u32 {
-    // Placeholder for a real hardware timer reading
-    0
 }
 
 bind_interrupts!(struct Irqs {
     I2C1_EV => i2c::EventInterruptHandler<peripherals::I2C1>;
     I2C1_ER => i2c::ErrorInterruptHandler<peripherals::I2C1>;
 });
+
 
 #[embassy_executor::main]
 async fn main(_spawner: Spawner) {
