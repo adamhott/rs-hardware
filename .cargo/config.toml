@@ -1,4 +1,5 @@
 [target.thumbv7em-none-eabihf]
+rustflags = ["--cfg", "feature=\"async\""]
 runner = 'probe-rs run --chip STM32H753ZITx'
 
 [build]
